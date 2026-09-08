@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Actualité — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .article{ max-width:720px; margin:0 auto; padding: 48px 24px; }
+  .article-thumb{ height:280px; border-radius: var(--radius-lg); background: linear-gradient(135deg,#2b3550, var(--color-primary)); margin-bottom:28px; }
+  .article h1{ font-size:clamp(1.7rem,3.5vw,2.3rem); margin: 12px 0; }
+  .article-meta{ font-size:.85rem; color: var(--color-text-muted); margin-bottom:24px; }
+  .article-body{ color: var(--color-text); line-height:1.8; white-space:pre-line; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html" data-i18n="nav_accueil">Accueil</a><a href="index.html#actualites" data-i18n="nav_actualites">Actualités</a></nav>
+    <div class="header-actions"><span class="lang-switch" style="display:flex; gap:6px; margin-right:6px;"><button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button><span style="color:rgba(255,255,255,.3);">|</span><button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button></span><a href="candidat.html" class="btn btn-accent btn-sm" data-i18n="btn_candidater">Candidater</a></div>
+  </div>
+</header>
+
+<div class="article" id="articleContent">
+  <div class="skeleton article-thumb"></div>
+  <div class="skeleton" style="height:32px;width:70%;margin-bottom:12px;"></div>
+  <div class="skeleton" style="height:120px;"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script>
+  function escapeHtml(str){ const d=document.createElement("div"); d.textContent = str ?? ""; return d.innerHTML; }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const slug = new URLSearchParams(window.location.search).get("slug");
+    if (!slug) { window.location.href = "index.html"; return; }
+
+    try {
+      const n = await VogtAPI.getNewsBySlug(slug);
+      document.title = n.title + " — VOGT HIGH TECH";
+      const date = n.publishedAt ? new Date(n.publishedAt).toLocaleDateString("fr-FR", { year:"numeric", month:"long", day:"numeric" }) : "";
+
+      document.getElementById("articleContent").innerHTML = `
+        <div class="article-thumb"></div>
+        <span class="eyebrow">${escapeHtml(n.category || "")}</span>
+        <h1>${escapeHtml(n.title)}</h1>
+        <div class="article-meta">${date}${n.author ? " · " + escapeHtml(n.author) : ""}</div>
+        <div class="article-body">${escapeHtml(n.content || n.excerpt || "")}</div>`;
+    } catch (err) {
+      document.getElementById("articleContent").innerHTML = `<div class="empty-state">Article introuvable ou non publié.</div>`;
+    }
+  });
+</script>
+<script src="js/vogt-ai.js"></script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .auth-wrap{ max-width:440px; margin: 64px auto; }
+  .tabs{ display:flex; gap:4px; background: var(--color-surface); border:1px solid var(--color-border); border-radius: var(--radius); padding:4px; margin-bottom:28px; }
+  .tab-btn{ flex:1; text-align:center; padding:.6rem 0; border-radius: 8px; font-size:.88rem; font-weight:600; color: var(--color-text-muted); cursor:pointer; }
+  .tab-btn.active{ background:#fff; color: var(--color-accent); box-shadow: var(--shadow-sm); }
+  .auth-form{ display:none; }
+  .auth-form.active{ display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html" data-i18n="nav_accueil">Accueil</a></nav>
+    <div class="header-actions"><span class="lang-switch" style="display:flex; gap:6px; margin-right:6px;"><button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button><span style="color:rgba(255,255,255,.3);">|</span><button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button></span></div>
+  </div>
+</header>
+
+<div class="wrap auth-wrap">
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab-btn active" data-tab="login">Connexion</div>
+      <div class="tab-btn" data-tab="register">Créer un compte candidat</div>
+    </div>
+
+    <div id="formMessage"></div>
+
+    <form id="loginForm" class="auth-form active">
+      <div class="field"><label data-i18n="login_email">Email</label><input type="email" id="loginEmail" required></div>
+      <div class="field"><label data-i18n="login_password">Mot de passe</label><input type="password" id="loginPassword" required></div>
+      <button type="submit" class="btn btn-accent btn-block" data-i18n="login_submit">Se connecter</button>
+    </form>
+    <p class="field-hint" style="margin-top:14px; text-align:center;"><a href="forgot-password.html" style="color:var(--color-accent);" data-i18n="forgot_password">Mot de passe oublié ?</a></p>
+
+    <form id="registerForm" class="auth-form">
+      <div class="form-row">
+        <div class="field"><label>Prénom</label><input type="text" id="regFirstName" required></div>
+        <div class="field"><label>Nom</label><input type="text" id="regLastName" required></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" id="regEmail" required></div>
+      <div class="field"><label>Téléphone</label><input type="tel" id="regPhone" required></div>
+      <div class="form-row">
+        <div class="field"><label>Date de naissance</label><input type="date" id="regDob"></div>
+        <div class="field"><label>Série du Bac</label><input type="text" id="regBac" placeholder="ex. Bac D"></div>
+      </div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="regPassword" required></div>
+      <button type="submit" class="btn btn-accent btn-block">Créer mon compte candidat</button>
+      <p class="field-hint" style="margin-top:12px;">Enseignant, étudiant ou membre du personnel ? Votre compte est créé par l'administration — contactez le support Vogt.</p>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

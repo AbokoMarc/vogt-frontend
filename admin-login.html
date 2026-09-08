@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion administration — VOGT ADMIN</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  body{ background: var(--color-primary); }
+  .auth-wrap{ max-width:400px; margin: 96px auto; }
+  .brand-center{ display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:28px; color:#fff; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="wrap auth-wrap">
+  <div class="brand-center">
+    <span class="brand-mark">V</span>
+    <div><b style="font-family:var(--font-head);">VOGT ADMIN</b><br><span style="font-family:var(--font-mono); font-size:.72rem; color:var(--color-secondary);">DIGITAL CAMPUS — ADMINISTRATION</span></div>
+  </div>
+  <div class="panel">
+    <div id="formMessage"></div>
+    <form id="loginForm">
+      <div class="field"><label>Email administrateur</label><input type="email" id="loginEmail" required></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="loginPassword" required></div>
+      <div class="field" id="codeField" style="display:none;">
+        <label>Code d'authentification (application 2FA)</label>
+        <input type="text" id="loginCode" inputmode="numeric" maxlength="6" placeholder="123456">
+      </div>
+      <button type="submit" class="btn btn-accent btn-block">Se connecter</button>
+    </form>
+    <p class="field-hint" style="margin-top:14px; text-align:center;"><a href="forgot-password.html" style="color:var(--color-accent);">Mot de passe oublié ?</a></p>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    const code = document.getElementById("loginCode").value;
+    const box = document.getElementById("formMessage");
+    box.innerHTML = "";
+    try {
+      const data = await VogtAPI.login(email, password, code || undefined);
+      const adminRoles = ["SUPER_ADMIN","ADMIN","ADMISSIONS_OFFICER","ACADEMIC_ADMIN","COMMUNICATION_ADMIN"];
+      if (!adminRoles.includes(data.role)) {
+        VogtAPI.logout();
+        box.innerHTML = `<div class="alert alert-error">Ce compte n'a pas accès à l'administration.</div>`;
+        return;
+      }
+      window.location.href = "admin.html";
+    } catch (err) {
+      const msg = err.message || "Identifiants invalides.";
+      if (msg.toLowerCase().includes("2fa") || msg.toLowerCase().includes("code")) {
+        document.getElementById("codeField").style.display = "block";
+      }
+      box.innerHTML = `<div class="alert alert-error">${msg}</div>`;
+    }
+  });
+
+  if (VogtAPI.isAuthenticated()) window.location.href = "admin.html";
+</script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

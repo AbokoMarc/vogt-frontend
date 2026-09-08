@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOGT HIGH TECH — École Supérieure de Technologie & d'Ingénierie</title>
+<meta name="description" content="VOGT HIGH TECH, école supérieure de technologie et d'ingénierie de l'INUCASTY à Yaoundé, Cameroun. Génie logiciel, intelligence artificielle, data science, électronique, robotique.">
+<meta property="og:title" content="VOGT HIGH TECH — École Supérieure de Technologie & d'Ingénierie">
+<meta property="og:description" content="Former les ingénieurs et innovateurs capables de concevoir les technologies de demain. Une école de l'INUCASTY, Yaoundé.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollegeOrUniversity",
+  "name": "VOGT HIGH TECH",
+  "alternateName": "VOGT HIGH TECH — École Supérieure de Technologie & d'Ingénierie",
+  "url": "https://VOTRE-DOMAINE/",
+  "logo": "https://VOTRE-DOMAINE/icons/icon-512.png",
+  "description": "École supérieure de technologie et d'ingénierie de l'INUCASTY à Yaoundé, Cameroun.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Yaoundé",
+    "addressCountry": "CM"
+  },
+  "parentOrganization": {
+    "@type": "CollegeOrUniversity",
+    "name": "INUCASTY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "url": "https://VOTRE-DOMAINE/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://VOTRE-DOMAINE/search.html?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .hero{ position:relative; overflow:hidden; background: var(--color-primary); padding: 90px 0 100px; }
+  .hero-carousel{ position:absolute; inset:0; z-index:0; }
+  .hero-carousel .slide{
+    position:absolute; inset:0; background-size:cover; background-position:center;
+    opacity:0; transition: opacity 1.4s ease; filter: brightness(.55) saturate(1.1);
+  }
+  .hero-carousel .slide.active{ opacity:1; }
+  .hero::before{ content:''; position:absolute; inset:0; z-index:1;
+    background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse 70% 60% at 70% 30%, black 10%, transparent 75%);
+  }
+  .hero::after{ content:''; position:absolute; top:-120px; right:-120px; width:520px; height:520px; z-index:1;
+    background: radial-gradient(circle, rgba(99,102,241,.35), transparent 70%); }
+  .hero-inner{ position:relative; z-index:2; max-width:660px; }
+  .hero-tag{ display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:6px 14px; margin-bottom:26px; font-family:var(--font-mono); font-size:.75rem; color: var(--color-secondary); }
+  .hero h1{ color:#fff; font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight:600; margin-bottom:20px; }
+  .hero h1 em{ font-style:normal; color: var(--color-secondary); }
+  .hero p.lede{ color: rgba(255,255,255,.72); font-size:1.05rem; margin-bottom:30px; max-width:500px; }
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:34px; }
+  .hero-signature{ font-family: var(--font-mono); font-size:.78rem; letter-spacing:.12em; color: rgba(255,255,255,.5); text-transform:uppercase; }
+  .stats-band{ background: var(--color-surface); border-bottom:1px solid var(--color-border); }
+  .filters{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:32px; }
+  .filter-btn{ font-family:var(--font-mono); font-size:.78rem; border:1px solid var(--color-border); background:#fff; color:var(--color-text-muted); padding:8px 16px; border-radius:999px; cursor:pointer; }
+  .filter-btn.active, .filter-btn:hover{ border-color: var(--color-accent); color: var(--color-accent); background: var(--color-accent-soft); }
+  .section-head{ max-width:640px; margin-bottom:40px; }
+  .section-head h2{ font-size:clamp(1.6rem,3vw,2.1rem); margin:8px 0 12px; }
+  .cta-band{ background: var(--color-accent); border-radius: var(--radius-lg); padding: 48px 40px; display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap; color:#fff; }
+  .cta-band h2{ color:#fff; font-size:1.7rem; max-width:460px; }
+  .cta-band p{ color: rgba(255,255,255,.85); margin-top:8px; max-width:420px; }
+  .cta-band .btn-outline{ background:#fff; color:var(--color-accent); border-color:#fff; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav">
+      <a href="index.html#formations" data-i18n="nav_formations">Formations</a>
+      <a href="candidat.html" data-i18n="nav_admissions">Admissions</a>
+      <a href="index.html#actualites" data-i18n="nav_actualites">Actualités</a>
+      <a href="index.html#evenements" data-i18n="nav_evenements">Événements</a>
+      <a href="staff-login.html" data-i18n="nav_espace_etudiant">Espace étudiant</a>
+    </nav>
+    <div class="header-actions">
+      <span class="lang-switch" style="display:flex; gap:6px; margin-right:4px;">
+        <button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button>
+        <span style="color:rgba(255,255,255,.3);">|</span>
+        <button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button>
+      </span>
+      <a href="search.html" class="icon-btn" style="color:rgba(255,255,255,.75);" title="Rechercher">🔍</a>
+      <a href="auth.html" class="btn btn-outline btn-sm" id="navAuthLink" data-i18n="btn_connexion" style="border-color:rgba(255,255,255,.28); color:#fff;">Connexion</a>
+      <a href="candidat.html" class="btn btn-accent btn-sm" data-i18n="btn_candidater">Candidater</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-carousel" id="heroCarousel"></div>
+  <div class="wrap hero-inner">
+    <span class="hero-tag">Yaoundé · Cameroun · Une école de l'INUCASTY</span>
+    <h1 data-i18n="hero_title">Former les ingénieurs qui <em>construiront demain.</em></h1>
+    <p class="lede" data-i18n="hero_lede">Une formation supérieure orientée ingénierie, technologie et entrepreneuriat — génie logiciel, intelligence artificielle, data science, électronique et robotique.</p>
+    <div class="hero-ctas">
+      <a href="candidat.html" class="btn btn-accent" data-i18n="hero_cta1">Candidater maintenant</a>
+      <a href="#formations" class="btn btn-ghost-dark" data-i18n="hero_cta2">Découvrir nos formations</a>
+    </div>
+    <span class="hero-signature">Learn · Build · Innovate</span>
+  </div>
+</section>
+
+<section class="stats-band">
+  <div class="wrap stats-grid" id="statsGrid">
+    <div class="stat"><div class="skeleton" style="height:32px;width:60px;margin-bottom:8px;"></div><span data-i18n="stats_programs">Formations publiées</span></div>
+    <div class="stat"><div class="skeleton" style="height:32px;width:60px;margin-bottom:8px;"></div><span data-i18n="stats_projects">Projets étudiants</span></div>
+    <div class="stat"><div class="skeleton" style="height:32px;width:60px;margin-bottom:8px;"></div><span data-i18n="stats_partners">Partenaires</span></div>
+    <div class="stat"><div class="skeleton" style="height:32px;width:60px;margin-bottom:8px;"></div><span data-i18n="stats_events">Événements à venir</span></div>
+  </div>
+</section>
+
+<section id="formations">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="formations_eyebrow">Nos programmes</span>
+      <h2 data-i18n="formations_title">Explorez nos formations</h2>
+      <p class="lede" data-i18n="formations_lede">Chargées directement depuis le back-office — aucune formation n'est codée en dur ici.</p>
+    </div>
+    <div class="filters" id="programFilters">
+      <button class="filter-btn active" data-category="">Tous</button>
+    </div>
+    <div class="card-grid" id="programGrid">
+      <div class="skeleton" style="height:280px;"></div>
+      <div class="skeleton" style="height:280px;"></div>
+      <div class="skeleton" style="height:280px;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="actualites" style="background:var(--color-surface); border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="news_eyebrow">Vogt News</span>
+      <h2 data-i18n="news_title">Actualités</h2>
+    </div>
+    <div class="card-grid" id="newsGrid">
+      <div class="skeleton" style="height:220px;"></div>
+      <div class="skeleton" style="height:220px;"></div>
+      <div class="skeleton" style="height:220px;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="evenements">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="events_eyebrow">Agenda</span>
+      <h2 data-i18n="events_title">Événements à venir</h2>
+    </div>
+    <div id="eventsList">
+      <div class="skeleton" style="height:56px;margin-bottom:12px;"></div>
+      <div class="skeleton" style="height:56px;"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <div>
+        <h2 data-i18n="cta_title">Votre aventure d'ingénieur commence ici.</h2>
+        <p data-i18n="cta_text">Candidature 100% numérique — suivez votre dossier en ligne, de la soumission à l'admission.</p>
+      </div>
+      <a href="candidat.html" class="btn btn-outline" data-i18n="cta_button">Commencer ma candidature</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="brand" style="color:#fff; margin-bottom:8px;"><span class="brand-mark">V</span><span class="brand-text"><b style="color:#fff">VOGT HIGH TECH</b></span></div>
+      <span class="badge-inucasty" data-i18n="footer_tagline">Une école de l'INUCASTY</span>
+    </div>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/home.js"></script>
+<script src="js/vogt-ai.js"></script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

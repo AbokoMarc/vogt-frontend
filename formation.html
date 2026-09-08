@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formation — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .prog-hero{ background: var(--color-primary); color:#fff; padding: 64px 0; }
+  .prog-hero h1{ color:#fff; font-size:clamp(2rem,4vw,2.8rem); margin-bottom:12px; }
+  .quick-facts{ display:flex; gap:28px; flex-wrap:wrap; margin-top:24px; }
+  .quick-facts div{ font-family:var(--font-mono); font-size:.8rem; color: var(--color-secondary); }
+  .quick-facts b{ display:block; color:#fff; font-family:var(--font-body); font-size:.95rem; margin-top:2px; }
+  .content{ max-width:760px; margin:0 auto; padding: 48px 24px; }
+  .content h2{ margin: 32px 0 12px; font-size:1.3rem; }
+  .content p{ color: var(--color-text-muted); line-height:1.7; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html" data-i18n="nav_accueil">Accueil</a><a href="index.html#formations" data-i18n="nav_formations">Formations</a></nav>
+    <div class="header-actions"><span class="lang-switch" style="display:flex; gap:6px; margin-right:6px;"><button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button><span style="color:rgba(255,255,255,.3);">|</span><button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button></span><a href="candidat.html" class="btn btn-accent btn-sm" data-i18n="btn_candidater">Candidater</a></div>
+  </div>
+</header>
+
+<section class="prog-hero">
+  <div class="wrap" id="progHero">
+    <div class="skeleton" style="height:32px;width:220px;margin-bottom:16px;background:rgba(255,255,255,.1);"></div>
+    <div class="skeleton" style="height:48px;width:60%;background:rgba(255,255,255,.1);"></div>
+  </div>
+</section>
+
+<div class="content" id="progContent">
+  <div class="skeleton" style="height:200px;"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script>
+  function escapeHtml(str){ const d=document.createElement("div"); d.textContent = str ?? ""; return d.innerHTML; }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const slug = new URLSearchParams(window.location.search).get("slug");
+    if (!slug) { window.location.href = "index.html"; return; }
+
+    try {
+      const p = await VogtAPI.getProgramBySlug(slug);
+      document.title = p.name + " — VOGT HIGH TECH";
+
+      document.getElementById("progHero").innerHTML = `
+        <span class="eyebrow" style="color:var(--color-secondary);">${escapeHtml(p.category || "")}</span>
+        <h1>${escapeHtml(p.name)}</h1>
+        <div class="quick-facts">
+          <div>Durée<b>${escapeHtml(p.durationLabel || "—")}</b></div>
+          <div>Diplôme<b>${escapeHtml(p.diplomaLabel || "—")}</b></div>
+          <div>Niveau<b>${escapeHtml(p.level || "—")}</b></div>
+        </div>`;
+
+      document.getElementById("progContent").innerHTML = `
+        <p>${escapeHtml(p.fullDescription || p.shortDescription || "")}</p>
+        <div style="margin-top:24px;">
+          <a href="candidat.html" class="btn btn-accent">Candidater à cette formation</a>
+        </div>`;
+    } catch (err) {
+      document.getElementById("progContent").innerHTML = `<div class="empty-state">Formation introuvable ou non publiée.</div>`;
+    }
+  });
+</script>
+<script src="js/vogt-ai.js"></script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

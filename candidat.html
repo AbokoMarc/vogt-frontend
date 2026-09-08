@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace candidat — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .layout{ max-width:760px; margin: 0 auto; padding: 48px 24px; }
+  .tracker-steps{ display:flex; justify-content:space-between; margin: 24px 0 8px; position:relative; }
+  .tracker-steps::before{ content:''; position:absolute; top:9px; left:0; right:0; height:2px; background: var(--color-border); z-index:0; }
+  .tstep{ position:relative; z-index:1; text-align:center; flex:1; }
+  .tstep .dot{ width:18px; height:18px; border-radius:50%; background:#fff; border:2px solid var(--color-border); margin:0 auto 8px; }
+  .tstep.done .dot{ background: var(--color-accent); border-color: var(--color-accent); }
+  .tstep span{ font-size:.7rem; color: var(--color-text-muted); font-family: var(--font-mono); }
+  .doc-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--color-border); }
+  .gate{ text-align:center; padding: 64px 24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html" data-i18n="nav_accueil">Accueil</a></nav>
+    <div class="header-actions">
+      <span class="lang-switch" style="display:flex; gap:6px; margin-right:6px;"><button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button><span style="color:rgba(255,255,255,.3);">|</span><button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button></span>
+      <button class="btn btn-outline btn-sm" id="logoutBtn" style="display:none;">Déconnexion</button>
+    </div>
+  </div>
+</header>
+
+<div id="gate" class="gate" style="display:none;">
+  <h2>Connectez-vous pour candidater</h2>
+  <p class="lede" style="margin:12px auto 24px;">Créez votre compte candidat ou connectez-vous pour démarrer votre dossier d'admission.</p>
+  <a href="auth.html" class="btn btn-accent">Connexion / Créer un compte</a>
+</div>
+
+<div id="portal" class="layout" style="display:none;">
+  <div class="section-head">
+    <span class="eyebrow">Portail candidat</span>
+    <h2>Votre candidature</h2>
+    <p class="lede">Choisissez votre formation, soumettez votre dossier, puis suivez son avancement en temps réel.</p>
+  </div>
+
+  <div id="messageBox"></div>
+
+  <div id="noApplication" class="panel" style="display:none;">
+    <h3 style="margin-bottom:18px;">Créer ma candidature</h3>
+    <div class="field">
+      <label>Formation — 1er choix</label>
+      <select id="firstChoice"></select>
+    </div>
+    <div class="field">
+      <label>Formation — 2e choix (optionnel)</label>
+      <select id="secondChoice"><option value="">— Aucun —</option></select>
+    </div>
+    <button class="btn btn-accent" id="createAppBtn">Créer ma candidature</button>
+  </div>
+
+  <div id="applicationTracker" class="panel" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div class="eyebrow" id="trackingNumber"></div>
+        <h3 id="programName" style="margin-top:4px;"></h3>
+      </div>
+      <span class="status-badge" id="statusBadge"></span>
+    </div>
+
+    <div class="tracker-steps" id="trackerSteps"></div>
+
+    <div id="submitZone" style="margin-top:24px;"></div>
+
+    <div style="margin-top:32px;">
+      <h4 style="font-size:.95rem; margin-bottom:12px; color:var(--color-primary);">Pièces justificatives</h4>
+      <div class="doc-row">
+        <span>Acte de naissance</span>
+        <input type="file" data-doc-type="ACTE_NAISSANCE" class="doc-upload">
+      </div>
+      <div class="doc-row">
+        <span>Diplôme / relevé de notes</span>
+        <input type="file" data-doc-type="DIPLOME" class="doc-upload">
+      </div>
+      <div class="doc-row">
+        <span>Carte Nationale d'Identité / récépissé</span>
+        <input type="file" data-doc-type="CNI" class="doc-upload">
+      </div>
+      <div class="doc-row">
+        <span>Photo d'identité</span>
+        <input type="file" data-doc-type="PHOTO" class="doc-upload">
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script src="js/candidat.js"></script>
+<script src="js/vogt-ai.js"></script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

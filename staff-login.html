@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion Étudiant / Enseignant — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .auth-wrap{ max-width:420px; margin: 64px auto; }
+  .tabs{ display:flex; gap:4px; background: var(--color-surface); border:1px solid var(--color-border); border-radius: var(--radius); padding:4px; margin-bottom:24px; }
+  .tab-btn{ flex:1; text-align:center; padding:.6rem 0; border-radius: 8px; font-size:.88rem; font-weight:600; color: var(--color-text-muted); cursor:pointer; }
+  .tab-btn.active{ background:#fff; color: var(--color-accent); box-shadow: var(--shadow-sm); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html" data-i18n="nav_accueil">Accueil</a></nav>
+    <div class="header-actions"><span class="lang-switch" style="display:flex; gap:6px; margin-right:6px;"><button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button><span style="color:rgba(255,255,255,.3);">|</span><button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button></span></div>
+  </div>
+</header>
+
+<div class="wrap auth-wrap">
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab-btn active" data-role="STUDENT">Étudiant</div>
+      <div class="tab-btn" data-role="TEACHER">Enseignant</div>
+    </div>
+
+    <p class="field-hint" style="margin-bottom:18px;">Votre compte a été créé par l'administration Vogt. Si vous n'avez pas encore vos identifiants, contactez le secrétariat.</p>
+
+    <div id="formMessage"></div>
+
+    <form id="loginForm">
+      <div class="field"><label data-i18n="login_email">Email</label><input type="email" id="loginEmail" required></div>
+      <div class="field"><label data-i18n="login_password">Mot de passe</label><input type="password" id="loginPassword" required></div>
+      <button type="submit" class="btn btn-accent btn-block" data-i18n="login_submit">Se connecter</button>
+    </form>
+
+    <p class="field-hint" style="margin-top:16px; text-align:center;">
+      <a href="forgot-password.html" style="color:var(--color-accent);" data-i18n="forgot_password">Mot de passe oublié ?</a>
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script>
+  let selectedTab = "STUDENT";
+
+  document.querySelectorAll(".tab-btn").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      selectedTab = tab.dataset.role;
+    });
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const box = document.getElementById("formMessage");
+    box.innerHTML = "";
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    try {
+      const data = await VogtAPI.login(email, password);
+      if (data.role !== "STUDENT" && data.role !== "TEACHER") {
+        VogtAPI.logout();
+        box.innerHTML = `<div class="alert alert-error">Ce compte n'est ni étudiant ni enseignant. Utilisez la page de connexion appropriée.</div>`;
+        return;
+      }
+      if (data.role !== selectedTab) {
+        box.innerHTML = `<div class="alert alert-success">Connecté en tant que ${data.role === "TEACHER" ? "enseignant" : "étudiant"} — redirection...</div>`;
+      }
+      window.location.href = data.role === "TEACHER" ? "enseignant.html" : "etudiant.html";
+    } catch (err) {
+      box.innerHTML = `<div class="alert alert-error">${err.message || "Identifiants invalides."}</div>`;
+    }
+  });
+
+  if (VogtAPI.isAuthenticated()) {
+    const role = VogtAPI.getRole();
+    if (role === "STUDENT") window.location.href = "etudiant.html";
+    else if (role === "TEACHER") window.location.href = "enseignant.html";
+  }
+</script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace étudiant — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="manifest" href="manifest-etudiant.json">
+<meta name="theme-color" content="#111827">
+<style>
+  .dash-layout{ display:grid; grid-template-columns: 220px 1fr; gap:32px; max-width:1100px; margin:0 auto; padding: 40px 24px; }
+  @media (max-width:860px){ .dash-layout{ grid-template-columns:1fr; } }
+  .side-nav a{ display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius: var(--radius); font-size:.9rem; color: var(--color-text); margin-bottom:4px; }
+  .side-nav a.active, .side-nav a:hover{ background: var(--color-accent-soft); color: var(--color-accent); }
+  .dash-panel{ display:none; }
+  .dash-panel.active{ display:block; }
+  .greeting{ margin-bottom:24px; }
+  table{ width:100%; border-collapse:collapse; }
+  th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid var(--color-border); font-size:.9rem; }
+  th{ font-family: var(--font-mono); font-size:.72rem; color: var(--color-text-muted); text-transform:uppercase; }
+  .gate{ text-align:center; padding: 64px 24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html">Accueil</a></nav>
+    <div class="header-actions">
+      <button class="btn btn-outline btn-sm" id="logoutBtn" style="display:none;">Déconnexion</button>
+    </div>
+  </div>
+</header>
+
+<div id="gate" class="gate" style="display:none;">
+  <h2>Espace réservé aux étudiants</h2>
+  <p class="lede" style="margin:12px auto 24px;">Connectez-vous avec votre compte étudiant pour accéder à votre tableau de bord.</p>
+  <a href="staff-login.html" class="btn btn-accent">Connexion</a>
+</div>
+
+<div id="dashboard" class="dash-layout" style="display:none;">
+  <nav class="side-nav">
+    <a href="#" data-panel="profile" class="active">👤 Profil</a>
+    <a href="#" data-panel="schedule">📅 Emploi du temps</a>
+    <a href="#" data-panel="grades">📝 Notes</a>
+    <a href="#" data-panel="payments">💰 Scolarité</a>
+    <a href="#" data-panel="security">🔒 Mot de passe</a>
+  </nav>
+
+  <div>
+    <div class="greeting">
+      <span class="eyebrow">Portail étudiant</span>
+      <h2 id="greetingText">Bonjour 👋</h2>
+    </div>
+
+    <div class="panel dash-panel active" id="panel-profile">
+      <div class="skeleton" style="height:100px;"></div>
+    </div>
+
+    <div class="panel dash-panel" id="panel-schedule">
+      <h3 style="margin-bottom:16px;">Emploi du temps</h3>
+      <div id="scheduleContent"><div class="skeleton" style="height:160px;"></div></div>
+    </div>
+
+    <div class="panel dash-panel" id="panel-grades">
+      <h3 style="margin-bottom:16px;">Notes</h3>
+      <div id="gradesContent"><div class="skeleton" style="height:160px;"></div></div>
+    </div>
+
+    <div class="panel dash-panel" id="panel-payments">
+      <h3 style="margin-bottom:16px;">Scolarité</h3>
+      <div id="paymentsContent"><div class="skeleton" style="height:120px;"></div></div>
+    </div>
+    <div class="panel dash-panel" id="panel-security">
+      <h3 style="margin-bottom:16px;">Changer mon mot de passe</h3>
+      <div id="pwdMsg"></div>
+      <form id="changePwdForm">
+        <div class="field"><label>Mot de passe actuel</label><input type="password" id="currentPwd" required></div>
+        <div class="field"><label>Nouveau mot de passe</label><input type="password" id="newPwd" required minlength="8"></div>
+        <button type="submit" class="btn btn-accent">Mettre à jour</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/etudiant.js"></script>
+<script src="js/portal-pwa.js"></script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

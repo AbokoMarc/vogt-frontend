@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recherche — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .search-wrap{ max-width:720px; margin:0 auto; padding:48px 24px; }
+  .search-bar{ display:flex; gap:10px; margin-bottom:32px; }
+  .search-bar input{ flex:1; padding:.8rem 1rem; border:1px solid var(--color-border); border-radius: var(--radius); font-size:1rem; }
+  .result-group{ margin-bottom:32px; }
+  .result-group h3{ font-size:1rem; margin-bottom:12px; }
+  .result-item{ display:block; padding:14px 16px; border:1px solid var(--color-border); border-radius: var(--radius); margin-bottom:8px; }
+  .result-item:hover{ border-color:var(--color-accent); }
+  .result-item span{ display:block; font-size:.8rem; color:var(--color-text-muted); margin-top:4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html" data-i18n="nav_accueil">Accueil</a></nav>
+    <div class="header-actions"><span class="lang-switch" style="display:flex; gap:6px; margin-right:6px;"><button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button><span style="color:rgba(255,255,255,.3);">|</span><button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button></span><a href="candidat.html" class="btn btn-accent btn-sm" data-i18n="btn_candidater">Candidater</a></div>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <span class="eyebrow">Recherche</span>
+  <h2 style="margin:8px 0 24px;" data-i18n="search_title">Que recherchez-vous ?</h2>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="génie logiciel, admissions, hackathon..." data-i18n-placeholder="search_placeholder">
+    <button class="btn btn-accent" id="searchBtn" data-i18n="search_button">Rechercher</button>
+  </div>
+  <div id="results"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script>
+  function escapeHtml(str){ const d=document.createElement("div"); d.textContent = str ?? ""; return d.innerHTML; }
+
+  async function runSearch(q) {
+    const el = document.getElementById("results");
+    if (!q || q.trim() === "") { el.innerHTML = ""; return; }
+    el.innerHTML = `<div class="skeleton" style="height:120px;"></div>`;
+    try {
+      const r = await VogtAPI.search(q);
+      const groups = [
+        { key: "programs", label: "Formations", link: p => `formation.html?slug=${encodeURIComponent(p.slug)}`, title: p => p.name, sub: p => p.shortDescription },
+        { key: "news", label: "Actualités", link: n => `actualite.html?slug=${encodeURIComponent(n.slug)}`, title: n => n.title, sub: n => n.excerpt },
+        { key: "faq", label: "FAQ", link: () => "#", title: f => f.question, sub: f => f.answer },
+      ];
+      const html = groups.map(g => {
+        const items = r[g.key] || [];
+        if (items.length === 0) return "";
+        return `<div class="result-group"><h3>${g.label}</h3>${items.map(it => `
+          <a class="result-item" href="${g.link(it)}">${escapeHtml(g.title(it))}<span>${escapeHtml((g.sub(it) || "").slice(0, 120))}</span></a>`).join("")}</div>`;
+      }).join("");
+      el.innerHTML = html || `<div class="empty-state">Aucun résultat pour "${escapeHtml(q)}".</div>`;
+    } catch (err) {
+      el.innerHTML = `<div class="empty-state">Recherche indisponible pour le moment.</div>`;
+    }
+  }
+
+  document.getElementById("searchBtn").addEventListener("click", () => runSearch(document.getElementById("searchInput").value));
+  document.getElementById("searchInput").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(e.target.value); });
+
+  const initial = new URLSearchParams(window.location.search).get("q");
+  if (initial) { document.getElementById("searchInput").value = initial; runSearch(initial); }
+</script>
+<script src="js/vogt-ai.js"></script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>
