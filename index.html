@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script src="js/theme-toggle.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOGT HIGH TECH — École Supérieure de Technologie & d'Ingénierie</title>
@@ -70,7 +71,7 @@
   .hero-signature{ font-family: var(--font-mono); font-size:.78rem; letter-spacing:.12em; color: rgba(255,255,255,.5); text-transform:uppercase; }
   .stats-band{ background: var(--color-surface); border-bottom:1px solid var(--color-border); }
   .filters{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:32px; }
-  .filter-btn{ font-family:var(--font-mono); font-size:.78rem; border:1px solid var(--color-border); background:#fff; color:var(--color-text-muted); padding:8px 16px; border-radius:999px; cursor:pointer; }
+  .filter-btn{ font-family:var(--font-mono); font-size:.78rem; border:1px solid var(--color-border); background:var(--color-bg); color:var(--color-text-muted); padding:8px 16px; border-radius:999px; cursor:pointer; }
   .filter-btn.active, .filter-btn:hover{ border-color: var(--color-accent); color: var(--color-accent); background: var(--color-accent-soft); }
   .section-head{ max-width:640px; margin-bottom:40px; }
   .section-head h2{ font-size:clamp(1.6rem,3vw,2.1rem); margin:8px 0 12px; }
@@ -78,6 +79,39 @@
   .cta-band h2{ color:#fff; font-size:1.7rem; max-width:460px; }
   .cta-band p{ color: rgba(255,255,255,.85); margin-top:8px; max-width:420px; }
   .cta-band .btn-outline{ background:#fff; color:var(--color-accent); border-color:#fff; }
+
+  .carousel-dots{ position:absolute; z-index:2; bottom:24px; left:0; right:0; display:flex; justify-content:center; gap:8px; }
+  .carousel-dots span{ width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.35); transition:.2s ease; }
+  .carousel-dots span.active{ background:#fff; width:20px; border-radius:4px; }
+
+  .why-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--color-border); border:1px solid var(--color-border); border-radius:var(--radius-lg); overflow:hidden; }
+  .why-card{ background:var(--color-bg); padding:32px 28px; transition:background-color .15s ease; }
+  .why-card:hover{ background:var(--color-primary-soft); }
+  .why-card .num{ font-family:var(--font-mono); color:var(--color-accent); font-size:.8rem; margin-bottom:16px; display:block; }
+  .why-card h3{ font-size:1.1rem; margin-bottom:8px; }
+  .why-card p{ color:var(--color-text-muted); font-size:.92rem; }
+
+  .labs-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .lab-card{ border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:26px; background:var(--color-surface); }
+  .lab-card .lab-dot{ width:10px; height:10px; border-radius:50%; background:var(--color-accent); margin-bottom:16px; }
+  .lab-card h3{ font-size:1rem; margin-bottom:6px; }
+  .lab-card p{ font-size:.86rem; color:var(--color-text-muted); }
+
+  .timeline{ display:grid; grid-template-columns:repeat(6,1fr); gap:0; position:relative; }
+  .timeline::before{ content:''; position:absolute; top:15px; left:0; right:0; height:1px; background:var(--color-border); }
+  .tstep{ position:relative; padding-top:36px; }
+  .tstep .dot{ position:absolute; top:9px; left:0; width:13px; height:13px; border-radius:50%; background:var(--color-accent); border:3px solid var(--color-bg); box-shadow:0 0 0 1px var(--color-accent); }
+  .tstep .time{ font-family:var(--font-mono); font-size:.72rem; color:var(--color-accent); display:block; margin-bottom:6px; }
+  .tstep h4{ font-size:.95rem; color:var(--color-primary); margin-bottom:4px; }
+  .tstep p{ font-size:.82rem; color:var(--color-text-muted); }
+  @media (max-width:768px){ .timeline{ grid-template-columns:repeat(2,1fr); row-gap:28px; } .timeline::before{ display:none; } }
+
+  .partners-strip{ display:flex; flex-wrap:wrap; gap:20px; align-items:center; justify-content:center; }
+  .partner-logo{ height:56px; max-width:160px; object-fit:contain; opacity:.75; transition:opacity .15s ease; }
+  .partner-logo:hover{ opacity:1; }
+  .partner-fallback{ font-family:var(--font-mono); font-size:.8rem; color:var(--color-text-muted); border:1px solid var(--color-border); border-radius:var(--radius); padding:14px 22px; }
+
+  .load-more-wrap{ text-align:center; margin-top:32px; }
 </style>
 </head>
 <body>
@@ -94,6 +128,7 @@
       <a href="index.html#actualites" data-i18n="nav_actualites">Actualités</a>
       <a href="index.html#evenements" data-i18n="nav_evenements">Événements</a>
       <a href="staff-login.html" data-i18n="nav_espace_etudiant">Espace étudiant</a>
+      <a href="staff-login.html?role=TEACHER" data-i18n="nav_espace_enseignant">Espace enseignant</a>
     </nav>
     <div class="header-actions">
       <span class="lang-switch" style="display:flex; gap:6px; margin-right:4px;">
@@ -131,6 +166,24 @@
   </div>
 </section>
 
+<section id="pourquoi">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="why_eyebrow">Pourquoi Vogt High Tech</span>
+      <h2 data-i18n="why_title">Une nouvelle génération d'enseignement technologique.</h2>
+      <p class="lede" data-i18n="why_lede">Une pédagogie construite autour de la pratique, des projets réels et de l'innovation.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card"><span class="num">01</span><h3 data-i18n="why1_title">Formation orientée pratique</h3><p data-i18n="why1_text">Des enseignements adossés à des projets concrets dès la première année.</p></div>
+      <div class="why-card"><span class="num">02</span><h3 data-i18n="why2_title">Technologies modernes</h3><p data-i18n="why2_text">IA, cloud, cybersécurité, systèmes embarqués — des programmes actualisés.</p></div>
+      <div class="why-card"><span class="num">03</span><h3 data-i18n="why3_title">Projets réels</h3><p data-i18n="why3_text">Les étudiants conçoivent et déploient de véritables produits techniques.</p></div>
+      <div class="why-card"><span class="num">04</span><h3 data-i18n="why4_title">Innovation & entrepreneuriat</h3><p data-i18n="why4_text">Hackathons, mentorat et accompagnement des idées vers le prototype.</p></div>
+      <div class="why-card"><span class="num">05</span><h3 data-i18n="why5_title">Recherche appliquée</h3><p data-i18n="why5_text">Des enseignants-chercheurs engagés sur des problématiques locales.</p></div>
+      <div class="why-card"><span class="num">06</span><h3 data-i18n="why6_title">Ouverture professionnelle</h3><p data-i18n="why6_text">Stages, entreprises partenaires et immersion dès le cursus.</p></div>
+    </div>
+  </div>
+</section>
+
 <section id="formations">
   <div class="wrap">
     <div class="section-head">
@@ -149,6 +202,20 @@
   </div>
 </section>
 
+<section id="labs">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="labs_eyebrow">Vogt Labs</span>
+      <h2 data-i18n="labs_title">Des environnements pour construire, pas seulement apprendre.</h2>
+    </div>
+    <div class="labs-grid" id="labsGrid">
+      <div class="skeleton" style="height:140px;"></div>
+      <div class="skeleton" style="height:140px;"></div>
+      <div class="skeleton" style="height:140px;"></div>
+    </div>
+  </div>
+</section>
+
 <section id="actualites" style="background:var(--color-surface); border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border);">
   <div class="wrap">
     <div class="section-head">
@@ -159,6 +226,9 @@
       <div class="skeleton" style="height:220px;"></div>
       <div class="skeleton" style="height:220px;"></div>
       <div class="skeleton" style="height:220px;"></div>
+    </div>
+    <div class="load-more-wrap" id="newsLoadMoreWrap" style="display:none;">
+      <button class="btn btn-outline" id="newsLoadMoreBtn" data-i18n="load_more">Voir plus d'actualités</button>
     </div>
   </div>
 </section>
@@ -172,6 +242,37 @@
     <div id="eventsList">
       <div class="skeleton" style="height:56px;margin-bottom:12px;"></div>
       <div class="skeleton" style="height:56px;"></div>
+    </div>
+  </div>
+</section>
+
+<section id="journee" style="background:var(--color-surface); border-top:1px solid var(--color-border); border-bottom:1px solid var(--color-border);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="day_eyebrow">Une journée à Vogt</span>
+      <h2 data-i18n="day_title">De l'amphithéâtre au laboratoire.</h2>
+    </div>
+    <div class="timeline">
+      <div class="tstep"><span class="dot"></span><span class="time">08:00</span><h4 data-i18n="day1_title">Cours</h4><p data-i18n="day1_text">Fondamentaux et spécialités</p></div>
+      <div class="tstep"><span class="dot"></span><span class="time">10:30</span><h4 data-i18n="day2_title">Laboratoire</h4><p data-i18n="day2_text">Travaux pratiques encadrés</p></div>
+      <div class="tstep"><span class="dot"></span><span class="time">13:00</span><h4 data-i18n="day3_title">Pause</h4><p data-i18n="day3_text">Vie de campus</p></div>
+      <div class="tstep"><span class="dot"></span><span class="time">14:00</span><h4 data-i18n="day4_title">Projet</h4><p data-i18n="day4_text">Travail en équipe projet</p></div>
+      <div class="tstep"><span class="dot"></span><span class="time">17:00</span><h4 data-i18n="day5_title">Club</h4><p data-i18n="day5_text">Robotics, AI, Coding Club</p></div>
+      <div class="tstep"><span class="dot"></span><span class="time">18:30</span><h4 data-i18n="day6_title">Innovation</h4><p data-i18n="day6_text">Hackathons & mentorat</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="partenaires">
+  <div class="wrap">
+    <div class="section-head center" style="margin-left:auto; margin-right:auto; text-align:center;">
+      <span class="eyebrow" data-i18n="partners_eyebrow">Construire avec l'écosystème</span>
+      <h2 data-i18n="partners_title">Nos partenaires</h2>
+    </div>
+    <div class="partners-strip" id="partnersStrip">
+      <div class="skeleton" style="height:56px;width:120px;"></div>
+      <div class="skeleton" style="height:56px;width:120px;"></div>
+      <div class="skeleton" style="height:56px;width:120px;"></div>
     </div>
   </div>
 </section>
@@ -195,11 +296,11 @@
       <span class="badge-inucasty" data-i18n="footer_tagline">Une école de l'INUCASTY</span>
     </div>
     <span class="copyright">© 2026 VOGT HIGH TECH</span>
+    <a href="admin-login.html" class="copyright" style="opacity:.5;">Administration</a>
   </div>
 </footer>
 
 <script src="js/i18n.js"></script>
-<script>window.VOGT_API_BASE_URL = "https://vogt-backend.onrender.com/api/v1";</script>
 <script src="js/api.js"></script>
 <script src="js/home.js"></script>
 <script src="js/vogt-ai.js"></script>

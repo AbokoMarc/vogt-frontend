@@ -75,6 +75,7 @@ const VogtAPI = (() => {
     getNewsBySlug: (slug) => request(`/public/news/${encodeURIComponent(slug)}?lang=${(window.VogtI18n ? VogtI18n.getLang() : "fr")}`),
     getUpcomingEvents: () => request(`/public/events/upcoming?lang=${(window.VogtI18n ? VogtI18n.getLang() : "fr")}`),
     getPartners: () => request("/public/partners"),
+    getLabs: () => request("/public/labs"),
     getStudentProjects: () => request("/public/projects"),
     getGallery: (album) => request(`/public/gallery${album ? "?album=" + encodeURIComponent(album) : ""}`),
     getFaq: (category) => {
@@ -123,7 +124,10 @@ const VogtAPI = (() => {
     getMyAttendance: () => request("/students/me/attendance", { auth: true }),
 
     // --- Portail enseignant ---
+    getMyTeacherProfile: () => request("/teachers/me/profile", { auth: true }),
     getMyCourses: () => request("/teachers/me/courses", { auth: true }),
+    getMyTeachingStudents: () => request("/teachers/me/students", { auth: true }),
+    getMyCourseOptions: () => request("/teachers/me/course-options", { auth: true }),
     enterGrade: (body) => request("/teachers/me/grades", { method: "POST", body, auth: true }),
     recordAttendance: (body) => request("/teachers/me/attendance", { method: "POST", body, auth: true }),
 

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script src="js/theme-toggle.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connexion Étudiant / Enseignant — VOGT HIGH TECH</title>
@@ -13,7 +14,7 @@
   .auth-wrap{ max-width:420px; margin: 64px auto; }
   .tabs{ display:flex; gap:4px; background: var(--color-surface); border:1px solid var(--color-border); border-radius: var(--radius); padding:4px; margin-bottom:24px; }
   .tab-btn{ flex:1; text-align:center; padding:.6rem 0; border-radius: 8px; font-size:.88rem; font-weight:600; color: var(--color-text-muted); cursor:pointer; }
-  .tab-btn.active{ background:#fff; color: var(--color-accent); box-shadow: var(--shadow-sm); }
+  .tab-btn.active{ background:var(--color-bg); color: var(--color-accent); box-shadow: var(--shadow-sm); }
 </style>
 </head>
 <body>
@@ -60,10 +61,18 @@
 </footer>
 
 <script src="js/i18n.js"></script>
-<script>window.VOGT_API_BASE_URL = "https://vogt-backend.onrender.com/api/v1";</script>
 <script src="js/api.js"></script>
 <script>
   let selectedTab = "STUDENT";
+
+  const preselect = new URLSearchParams(window.location.search).get("role");
+  if (preselect === "TEACHER") {
+    selectedTab = "TEACHER";
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+      document.querySelector('.tab-btn[data-role="TEACHER"]').classList.add("active");
+    });
+  }
 
   document.querySelectorAll(".tab-btn").forEach(tab => {
     tab.addEventListener("click", () => {

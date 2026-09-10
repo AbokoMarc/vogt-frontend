@@ -870,17 +870,15 @@ function openTeacherModal() {
     <div class="field"><label>Téléphone</label><input name="phone"></div>
     <div class="field"><label>Département</label><input name="department" placeholder="Informatique"></div>
     <div class="field"><label>Titre</label><input name="title" placeholder="Enseignant-chercheur"></div>
-    <div class="field"><label>Mot de passe initial</label><input name="initialPassword" type="text" required placeholder="À communiquer à l'enseignant"></div>
-    <p class="field-hint" style="margin-bottom:14px;">Un email avec un lien pour définir son propre mot de passe lui sera aussi envoyé.</p>
+    <p class="field-hint" style="margin-bottom:14px;">🔒 Un mot de passe temporaire sécurisé est généré automatiquement — vous n'avez rien à saisir. L'enseignant recevra un email avec un lien pour définir son propre mot de passe.</p>
     <button type="submit" class="btn btn-accent btn-block">Créer le compte</button>
   `, async (formData) => {
     await VogtAPI.admin.createTeacher({
       firstName: formData.get("firstName"), lastName: formData.get("lastName"),
       email: formData.get("email"), phone: formData.get("phone"),
-      initialPassword: formData.get("initialPassword"),
       department: formData.get("department"), title: formData.get("title"), specialties: [],
     });
-    showMessage("Compte enseignant créé.", "success");
+    showMessage("Compte enseignant créé — email envoyé.", "success");
     closeModal();
     await loadTeachers();
   });
@@ -928,17 +926,16 @@ function openStudentModal() {
     <div class="field"><label>Formation</label>
       <select name="programId">${(programsCache || []).map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("")}</select>
     </div>
-    <div class="field"><label>Mot de passe initial</label><input name="initialPassword" type="text" required></div>
+    <p class="field-hint" style="margin-bottom:14px;">🔒 Un mot de passe temporaire sécurisé est généré automatiquement. L'étudiant recevra un email avec un lien pour définir son propre mot de passe.</p>
     <button type="submit" class="btn btn-accent btn-block">Créer le compte</button>
   `, async (formData) => {
     await VogtAPI.admin.createStudent({
       firstName: formData.get("firstName"), lastName: formData.get("lastName"),
       email: formData.get("email"), phone: formData.get("phone"),
-      initialPassword: formData.get("initialPassword"),
       matricule: formData.get("matricule"), yearOfStudy: Number(formData.get("yearOfStudy") || 1),
       programId: formData.get("programId") || null,
     });
-    showMessage("Compte étudiant créé.", "success");
+    showMessage("Compte étudiant créé — email envoyé.", "success");
     closeModal();
     await loadStudentsAccounts();
   });
@@ -984,15 +981,14 @@ function openAdminAccountModal() {
     </div>
     <div class="field"><label>Email</label><input name="email" type="email" required></div>
     <div class="field"><label>Rôle</label><select name="role">${roleOptions}</select></div>
-    <div class="field"><label>Mot de passe initial</label><input name="initialPassword" type="text" required></div>
+    <p class="field-hint" style="margin-bottom:14px;">🔒 Un mot de passe temporaire sécurisé est généré automatiquement. La personne recevra un email avec un lien pour définir son propre mot de passe.</p>
     <button type="submit" class="btn btn-accent btn-block">Créer le compte</button>
   `, async (formData) => {
     await VogtAPI.admin.createAdmin({
       firstName: formData.get("firstName"), lastName: formData.get("lastName"),
-      email: formData.get("email"), initialPassword: formData.get("initialPassword"),
-      role: formData.get("role"),
+      email: formData.get("email"), role: formData.get("role"),
     });
-    showMessage("Compte administration créé.", "success");
+    showMessage("Compte administration créé — email envoyé.", "success");
     closeModal();
     await loadAdminAccounts();
   });

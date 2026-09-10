@@ -66,8 +66,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  await loadProfile();
   await loadCourses();
+  await loadPickers();
 });
+
+async function loadProfile() {
+  try {
+    const profile = await VogtAPI.getMyTeacherProfile();
+    document.getElementById("greetingText").textContent = `Bonjour ${profile.firstName || ""} 👋`;
+  } catch (err) {
+    // reste sur le titre generique si le profil ne charge pas
+  }
+}
 
 async function loadCourses() {
   const el = document.getElementById("coursesContent");
@@ -89,6 +100,30 @@ async function loadCourses() {
       </table>`;
   } catch (err) {
     el.innerHTML = `<div class="empty-state">Impossible de charger vos cours.</div>`;
+  }
+}
+
+/** Remplit les listes deroulantes etudiant/matiere pour eviter la saisie d'UUID a la main. */
+async function loadPickers() {
+  try {
+    const [students, courses] = await Promise.all([
+      VogtAPI.getMyTeachingStudents(), VogtAPI.getMyCourseOptions(),
+    ]);
+
+    const studentOptions = (students && students.length)
+      ? students.map(s => `<option value="${s.id}">${escapeHtml(s.matricule || "")} — ${escapeHtml(s.firstName + " " + s.lastName)} (${escapeHtml(s.programName || "")})</option>`).join("")
+      : `<option value="">Aucun étudiant trouvé dans vos formations</option>`;
+
+    const courseOptions = (courses && courses.length)
+      ? courses.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("")
+      : `<option value="">Aucune matière assignée</option>`;
+
+    ["gradeStudentId", "attStudentId"].forEach(id => { document.getElementById(id).innerHTML = studentOptions; });
+    ["gradeCourseId", "attCourseId"].forEach(id => { document.getElementById(id).innerHTML = courseOptions; });
+  } catch (err) {
+    ["gradeStudentId", "attStudentId", "gradeCourseId", "attCourseId"].forEach(id => {
+      document.getElementById(id).innerHTML = `<option value="">Impossible de charger</option>`;
+    });
   }
 }
 

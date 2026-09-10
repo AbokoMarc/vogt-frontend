@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadEvents();
   loadStats();
   loadHeroCarousel();
+  loadLabs();
+  loadPartnersSection();
 });
 
 async function loadHeroCarousel() {
@@ -29,16 +31,60 @@ async function loadHeroCarousel() {
     ).join("");
 
     if (images.length > 1) {
+      const dotsWrap = document.createElement("div");
+      dotsWrap.className = "carousel-dots";
+      dotsWrap.innerHTML = images.map((_, i) => `<span class="${i === 0 ? "active" : ""}"></span>`).join("");
+      document.querySelector(".hero").appendChild(dotsWrap);
+
       let current = 0;
       setInterval(() => {
         const slides = container.querySelectorAll(".slide");
+        const dots = dotsWrap.querySelectorAll("span");
         slides[current].classList.remove("active");
+        dots[current].classList.remove("active");
         current = (current + 1) % slides.length;
         slides[current].classList.add("active");
+        dots[current].classList.add("active");
       }, 5000);
     }
   } catch (err) {
     // Pas grave — le fond graphique par défaut du hero reste affiché.
+  }
+}
+
+async function loadLabs() {
+  const grid = document.getElementById("labsGrid");
+  try {
+    const labs = await VogtAPI.getLabs();
+    if (!labs || labs.length === 0) {
+      grid.innerHTML = `<div class="empty-state">Aucun laboratoire publié pour le moment.</div>`;
+      return;
+    }
+    grid.innerHTML = labs.map(l => `
+      <div class="lab-card">
+        <div class="lab-dot"></div>
+        <h3>${escapeHtml(l.name)}</h3>
+        <p>${escapeHtml(l.description || "")}</p>
+      </div>`).join("");
+  } catch (err) {
+    grid.innerHTML = `<div class="empty-state">Impossible de charger les laboratoires.</div>`;
+  }
+}
+
+async function loadPartnersSection() {
+  const strip = document.getElementById("partnersStrip");
+  try {
+    const partners = await VogtAPI.getPartners();
+    if (!partners || partners.length === 0) {
+      strip.innerHTML = `<div class="empty-state">Aucun partenaire publié pour le moment.</div>`;
+      return;
+    }
+    strip.innerHTML = partners.map(p => p.logoUrl
+      ? `<img class="partner-logo" src="${p.logoUrl}" alt="${escapeHtml(p.name)}" title="${escapeHtml(p.name)}">`
+      : `<span class="partner-fallback">${escapeHtml(p.name)}</span>`
+    ).join("");
+  } catch (err) {
+    strip.innerHTML = `<div class="empty-state">Impossible de charger les partenaires.</div>`;
   }
 }
 
@@ -111,18 +157,45 @@ function programCard(p) {
     </a>`;
 }
 
+let newsPage = 0;
+const NEWS_PAGE_SIZE = 6;
+
 async function loadNews() {
   const grid = document.getElementById("newsGrid");
+  const loadMoreWrap = document.getElementById("newsLoadMoreWrap");
   try {
-    const result = await VogtAPI.getNews(0, 3);
+    const result = await VogtAPI.getNews(0, NEWS_PAGE_SIZE);
     const items = result && result.items ? result.items : [];
+    newsPage = 0;
     if (items.length === 0) {
       grid.innerHTML = `<div class="empty-state">${t("empty_news")}</div>`;
+      loadMoreWrap.style.display = "none";
       return;
     }
     grid.innerHTML = items.map(newsCard).join("");
+    const hasMore = result.totalPages && result.totalPages > 1;
+    loadMoreWrap.style.display = hasMore ? "block" : "none";
+    document.getElementById("newsLoadMoreBtn").onclick = loadMoreNews;
   } catch (err) {
     grid.innerHTML = errorState("Impossible de charger les actualités pour le moment.", err);
+  }
+}
+
+async function loadMoreNews() {
+  const btn = document.getElementById("newsLoadMoreBtn");
+  btn.disabled = true;
+  try {
+    newsPage += 1;
+    const result = await VogtAPI.getNews(newsPage, NEWS_PAGE_SIZE);
+    const items = result && result.items ? result.items : [];
+    document.getElementById("newsGrid").insertAdjacentHTML("beforeend", items.map(newsCard).join(""));
+    if (!result.totalPages || newsPage >= result.totalPages - 1) {
+      document.getElementById("newsLoadMoreWrap").style.display = "none";
+    }
+  } catch (err) {
+    // silencieux — le bouton reste disponible pour reessayer
+  } finally {
+    btn.disabled = false;
   }
 }
 
