@@ -20,14 +20,21 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Reseau uniquement pour l'API (jamais de cache sur des donnees institutionnelles
-// qui doivent toujours venir a jour) — cache-first pour les assets statiques.
+// Reseau uniquement pour l'API et pour toute navigation de page (jamais de
+// cache sur l'API, et jamais le SW comme point unique de defaillance pour
+// charger une page) — cache-first seulement pour les vrais assets statiques
+// deja mis en cache a l'installation.
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  if (url.pathname.includes("/api/")) return;
+
+  // Ne jamais intercepter les appels API ni les navigations entre pages —
+  // elles doivent toujours passer par le reseau normalement.
+  if (url.pathname.includes("/api/") || event.request.mode === "navigate") {
+    return;
+  }
 
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => cached))
   );
 });
 

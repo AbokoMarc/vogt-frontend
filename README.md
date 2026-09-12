@@ -17,14 +17,15 @@ API central (`js/api.js`) qui consomme le backend Spring Boot.
 
 ## Configuration
 
-Le frontend appelle l'API sur `http://localhost:8080/api/v1` par défaut.
-Pour changer l'URL (staging/production), ajoutez avant `js/api.js` dans chaque
-page :
+L'URL de l'API est centralisée dans **`js/config.js`** — un seul fichier à
+modifier, chargé en premier sur chaque page :
 
-```html
-<script>window.VOGT_API_BASE_URL = "https://api.vogthightech.cm/api/v1";</script>
-<script src="js/api.js"></script>
+```js
+window.VOGT_API_BASE_URL = "https://api.vogthightech.cm/api/v1";
 ```
+
+Changez cette valeur une fois après chaque déploiement du backend ; toutes
+les pages la reprennent automatiquement.
 
 ## Démarrage local
 
