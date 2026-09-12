@@ -5,7 +5,7 @@
  */
 const VogtAPI = (() => {
 
-  // URL corrigée avec le sous-domaine exact de votre application sur Render
+  // URL absolue exacte pointant vers votre instance backend Spring Boot
   const BASE_URL = "https://onrender.com";
 
   const TOKEN_KEY = "vogt_access_token";
