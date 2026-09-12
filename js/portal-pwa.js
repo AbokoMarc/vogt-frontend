@@ -37,7 +37,7 @@
   async function registerServiceWorkerAndPush() {
     if (!("serviceWorker" in navigator)) return;
     try {
-      const registration = await navigator.serviceWorker.register("service-worker.js");
+      const registration = await navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" });
 
       if (!("PushManager" in window) || !VogtAPI.isAuthenticated()) return;
 

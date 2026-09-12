@@ -1,58 +1,68 @@
-const CACHE_NAME = "vogt-campus-v1";
-const STATIC_ASSETS = [
-  "css/theme.css",
-  "js/api.js",
+const CACHE_NAME = "vogt-campus-v2";
+const STATIC_CACHE = [
+  "/",
+  "/index.html",
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-  );
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.addAll(STATIC_CACHE).catch(() => undefined)
+    )
+  );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+        )
+      ),
+    ])
   );
-  self.clients.claim();
 });
 
-// Reseau uniquement pour l'API et pour toute navigation de page (jamais de
-// cache sur l'API, et jamais le SW comme point unique de defaillance pour
-// charger une page) — cache-first seulement pour les vrais assets statiques
-// deja mis en cache a l'installation.
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
+  const request = event.request;
+  const url = new URL(request.url);
 
-  // Ne jamais intercepter les appels API ni les navigations entre pages —
-  // elles doivent toujours passer par le reseau normalement.
-  if (url.pathname.includes("/api/") || event.request.mode === "navigate") {
+  // API requests must always go directly to the backend.
+  // Do not cache/intercept them from the Netlify origin.
+  if (
+    url.hostname === "vogt-backend.onrender.com" ||
+    url.pathname.startsWith("/api/")
+  ) {
+    return;
+  }
+
+  // Only handle GET requests.
+  if (request.method !== "GET") {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => cached))
+    fetch(request)
+      .then((response) => {
+        if (response && response.ok && url.origin === self.location.origin) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      })
+      .catch(() =>
+        caches.match(request).then(
+          (cached) => cached || new Response("", {
+            status: 503,
+            statusText: "Offline",
+            headers: { "Content-Type": "text/plain; charset=utf-8" }
+          })
+        )
+      )
   );
-});
-
-// Vraies notifications systeme (Web Push) — reçues meme app/onglet fermé.
-self.addEventListener("push", (event) => {
-  let data = { title: "VOGT HIGH TECH", body: "Vous avez une nouvelle notification." };
-  try { data = event.data.json(); } catch (e) { /* payload texte simple */ }
-
-  event.waitUntil(
-    self.registration.showNotification(data.title || "VOGT HIGH TECH", {
-      body: data.body || "",
-      icon: "icons/icon-192.png",
-      badge: "icons/icon-192.png",
-    })
-  );
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  event.waitUntil(clients.openWindow("/"));
 });
