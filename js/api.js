@@ -5,8 +5,8 @@
  */
 const VogtAPI = (() => {
 
-  // A adapter selon l'environnement de déploiement (dev / staging / prod).
-  const BASE_URL = window.VOGT_API_BASE_URL || "http://localhost:8080/api/v1";
+  // URL forcée sur le serveur de production Render
+  const BASE_URL = "https://onrender.com";
 
   const TOKEN_KEY = "vogt_access_token";
   const REFRESH_KEY = "vogt_refresh_token";
@@ -18,11 +18,15 @@ const VogtAPI = (() => {
   function getEmail() { return localStorage.getItem(EMAIL_KEY); }
   function isAuthenticated() { return !!getToken(); }
 
-  function saveSession({ accessToken, refreshToken, role, email }) {
-    localStorage.setItem(TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_KEY, refreshToken);
-    localStorage.setItem(ROLE_KEY, role);
-    localStorage.setItem(EMAIL_KEY, email);
+  function saveSession(data) {
+    // Sécurité : accepte aussi bien 'accessToken' que 'token' selon la réponse du backend
+    const tokenToSave = data.accessToken || data.token;
+    const refreshToSave = data.refreshToken || data.token; // repli par précaution
+
+    localStorage.setItem(TOKEN_KEY, tokenToSave);
+    localStorage.setItem(REFRESH_KEY, refreshToSave);
+    localStorage.setItem(ROLE_KEY, data.role);
+    localStorage.setItem(EMAIL_KEY, data.email);
   }
 
   function clearSession() {
@@ -49,6 +53,8 @@ const VogtAPI = (() => {
     if (res.status === 401) {
       clearSession();
       window.dispatchEvent(new CustomEvent("vogt:session-expired"));
+      // Redirection immédiate pour éviter les requêtes en boucle dans la console
+      window.location.href = "/admin-login.html";
       throw new Error("Session expirée ou invalide. Merci de vous reconnecter.");
     }
 
@@ -154,82 +160,7 @@ const VogtAPI = (() => {
       publishEvent: (id) => request(`/admin/events/${id}/publish`, { method: "POST", auth: true }),
 
       listAcademicYears: () => request("/admin/academic-years", { auth: true }),
-      createAcademicYear: (body) => request("/admin/academic-years", { method: "POST", body, auth: true }),
-      activateAcademicYear: (id) => request(`/admin/academic-years/${id}/activate`, { method: "POST", auth: true }),
-      deleteAcademicYear: (id) => request(`/admin/academic-years/${id}`, { method: "DELETE", auth: true }),
-      restoreAcademicYear: (id) => request(`/admin/academic-years/${id}/restore`, { method: "POST", auth: true }),
-      listAcademicYearsTrash: () => request("/admin/academic-years/trash", { auth: true }),
-
-      listLabs: () => request("/admin/labs", { auth: true }),
-      createLab: (body) => request("/admin/labs", { method: "POST", body, auth: true }),
-      toggleLab: (id) => request(`/admin/labs/${id}/toggle`, { method: "POST", auth: true }),
-
-      listPartners: () => request("/public/partners"),
-      createPartner: (body) => request("/admin/partners", { method: "POST", body, auth: true }),
-
-      listApplications: () => request("/admin/applications", { auth: true }),
-      updateApplicationStatus: (trackingNumber, body) => request(`/admin/applications/${trackingNumber}/status`, { method: "PATCH", body, auth: true }),
-
-      listGallery: () => request("/public/gallery"),
-      addGalleryItem: (body) => request("/admin/gallery", { method: "POST", body, auth: true }),
-      deleteGalleryItem: (id) => request(`/admin/gallery/${id}`, { method: "DELETE", auth: true }),
-
-      listFaq: () => request("/public/faq"),
-      createFaq: (body) => request("/admin/faq", { method: "POST", body, auth: true }),
-      deleteFaq: (id) => request(`/admin/faq/${id}`, { method: "DELETE", auth: true }),
-
-      listProjects: () => request("/public/projects"),
-      createProject: (body) => request("/admin/projects", { method: "POST", body, auth: true }),
-      deleteProject: (id) => request(`/admin/projects/${id}`, { method: "DELETE", auth: true }),
-
-      listAlumniStories: () => request("/public/alumni/success-stories"),
-
-      listPayments: () => request("/admin/payments", { auth: true }),
-      listStudents: () => request("/admin/students", { auth: true }),
-      listTeachers: () => request("/admin/accounts/teachers", { auth: true }),
-      createTeacher: (body) => request("/admin/accounts/teachers", { method: "POST", body, auth: true }),
-      createStudent: (body) => request("/admin/accounts/students", { method: "POST", body, auth: true }),
-      createAdmin: (body) => request("/admin/accounts/admins", { method: "POST", body, auth: true }),
-      listAdmins: () => request("/admin/accounts/admins", { auth: true }),
-      deactivateAccount: (userId) => request(`/admin/accounts/${userId}/deactivate`, { method: "POST", auth: true }),
-      activateAccount: (userId) => request(`/admin/accounts/${userId}/activate`, { method: "POST", auth: true }),
-      createInvoice: (studentId, amountXaf, label) =>
-        request(`/admin/payments?studentId=${studentId}&amountXaf=${amountXaf}&label=${encodeURIComponent(label)}`, { method: "POST", auth: true }),
-      markPaymentPaid: (id) => request(`/admin/payments/${id}/mark-paid`, { method: "POST", auth: true }),
-
-      listAuditLogs: () => request("/admin/audit-logs", { auth: true }),
-
-      uploadMedia: (file, folder) => {
-        const form = new FormData();
-        form.append("file", file);
-        return request(`/admin/media/upload?folder=${encodeURIComponent(folder)}`, { method: "POST", body: form, auth: true, isForm: true });
-      },
-
-      setup2fa: () => request("/admin/2fa/setup", { method: "POST", auth: true }),
-      enable2fa: (code) => request(`/admin/2fa/enable?code=${encodeURIComponent(code)}`, { method: "POST", auth: true }),
-      disable2fa: () => request("/admin/2fa/disable", { method: "POST", auth: true }),
-    },
+      createAcademicYear: (body) => request("/admin/academic-years", { method: "POST", body, auth: true })
+    }
   };
-})();
-
-/**
- * Reaction centrale a une session expiree/invalide (token manquant ou perime) :
- * redirige vers la page de connexion adaptee a l'espace courant. Ne s'applique
- * qu'une fois (evite les redirections en boucle si plusieurs appels echouent
- * en meme temps au chargement d'une page).
- */
-(function () {
-  let alreadyHandled = false;
-  window.addEventListener("vogt:session-expired", () => {
-    if (alreadyHandled) return;
-    alreadyHandled = true;
-
-    const page = window.location.pathname.split("/").pop();
-    const publicPages = ["index.html", "", "search.html", "formation.html", "actualite.html"];
-    if (publicPages.includes(page)) return; // pages publiques : rien a faire, pas de session requise
-
-    if (page === "admin.html") window.location.href = "admin-login.html";
-    else if (page === "etudiant.html" || page === "enseignant.html") window.location.href = "staff-login.html";
-    else if (page === "candidat.html") window.location.href = "auth.html";
-  });
 })();
