@@ -5,7 +5,7 @@
  */
 const VogtAPI = (() => {
 
-  // URL forcée sur le serveur de production Render
+  // URL corrigée avec le sous-domaine exact de votre application sur Render
   const BASE_URL = "https://onrender.com";
 
   const TOKEN_KEY = "vogt_access_token";
@@ -19,9 +19,8 @@ const VogtAPI = (() => {
   function isAuthenticated() { return !!getToken(); }
 
   function saveSession(data) {
-    // Sécurité : accepte aussi bien 'accessToken' que 'token' selon la réponse du backend
     const tokenToSave = data.accessToken || data.token;
-    const refreshToSave = data.refreshToken || data.token; // repli par précaution
+    const refreshToSave = data.refreshToken || data.token;
 
     localStorage.setItem(TOKEN_KEY, tokenToSave);
     localStorage.setItem(REFRESH_KEY, refreshToSave);
@@ -53,7 +52,6 @@ const VogtAPI = (() => {
     if (res.status === 401) {
       clearSession();
       window.dispatchEvent(new CustomEvent("vogt:session-expired"));
-      // Redirection immédiate pour éviter les requêtes en boucle dans la console
       window.location.href = "/admin-login.html";
       throw new Error("Session expirée ou invalide. Merci de vous reconnecter.");
     }
