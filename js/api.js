@@ -163,7 +163,49 @@ if (!BASE_URL) {
       publishEvent: (id) => request(`/admin/events/${id}/publish`, { method: "POST", auth: true }),
 
       listAcademicYears: () => request("/admin/academic-years", { auth: true }),
-      createAcademicYear: (body) => request("/admin/academic-years", { method: "POST", body, auth: true })
+      createAcademicYear: (body) => request("/admin/academic-years", { method: "POST", body, auth: true }),
+      listAcademicYearsTrash: () => request("/admin/academic-years/trash", { auth: true }),
+      activateAcademicYear: (id) => request(`/admin/academic-years/${id}/activate`, { method: "POST", auth: true }),
+      deleteAcademicYear: (id) => request(`/admin/academic-years/${id}`, { method: "DELETE", auth: true }),
+
+      listLabs: () => request("/admin/labs", { auth: true }),
+      createLab: (body) => request("/admin/labs", { method: "POST", body, auth: true }),
+      updateLab: (id, body) => request(`/admin/labs/${id}`, { method: "PATCH", body, auth: true }),
+      toggleLab: (id) => request(`/admin/labs/${id}/toggle`, { method: "POST", auth: true }),
+
+      listApplications: () => request("/admin/applications", { auth: true }),
+      updateApplicationStatus: (trackingNumber, body) => request(`/admin/applications/${encodeURIComponent(trackingNumber)}/status`, { method: "PATCH", body, auth: true }),
+
+      listPartners: () => request("/admin/partners", { auth: true }),
+      createPartner: (body) => request("/admin/partners", { method: "POST", body, auth: true }),
+      updatePartner: (id, body) => request(`/admin/partners/${id}`, { method: "PATCH", body, auth: true }),
+
+      listGallery: () => request("/admin/gallery", { auth: true }),
+      createGalleryItem: (body) => request("/admin/gallery", { method: "POST", body, auth: true }),
+      deleteGalleryItem: (id) => request(`/admin/gallery/${id}`, { method: "DELETE", auth: true }),
+
+      listFaq: () => request("/admin/faq", { auth: true }),
+      createFaq: (body) => request("/admin/faq", { method: "POST", body, auth: true }),
+      deleteFaq: (id) => request(`/admin/faq/${id}`, { method: "DELETE", auth: true }),
+
+      listProjects: () => request("/admin/projects", { auth: true }),
+      createProject: (body) => request("/admin/projects", { method: "POST", body, auth: true }),
+      deleteProject: (id) => request(`/admin/projects/${id}`, { method: "DELETE", auth: true }),
+
+      listPayments: () => request("/admin/payments", { auth: true }),
+      createInvoice: (studentId, body) => request(`/admin/payments?studentId=${encodeURIComponent(studentId)}`, { method: "POST", body, auth: true }),
+      markPaymentPaid: (id, receiptUrl) => request(`/admin/payments/${id}/mark-paid${receiptUrl ? "?receiptUrl=" + encodeURIComponent(receiptUrl) : ""}`, { method: "POST", auth: true }),
+
+      listStudents: () => request("/admin/students", { auth: true }),
+      createStudent: (body) => request("/admin/accounts/students", { method: "POST", body, auth: true }),
+
+      listTeachers: () => request("/admin/accounts/teachers", { auth: true }),
+      createTeacher: (body) => request("/admin/accounts/teachers", { method: "POST", body, auth: true }),
+
+      listAdmins: () => request("/admin/accounts/admins", { auth: true }),
+      createAdmin: (body) => request("/admin/accounts/admins", { method: "POST", body, auth: true }),
+
+      listAuditLogs: () => request("/admin/audit-logs", { auth: true })
     }
   };
 })();
