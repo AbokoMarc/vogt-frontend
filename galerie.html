@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="js/theme-toggle.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galerie — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .gal-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width:768px){ .gal-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:480px){ .gal-grid{ grid-template-columns:1fr; } }
+  .gal-item{ border:1px solid var(--color-border); overflow:hidden; cursor:pointer; background:var(--color-surface); aspect-ratio:4/3; }
+  .gal-item img{ width:100%; height:100%; object-fit:cover; transition:transform .2s ease; }
+  .gal-item:hover img{ transform:scale(1.04); }
+  .lightbox{ position:fixed; inset:0; background:rgba(16,21,31,.92); z-index:500; display:none; align-items:center; justify-content:center; padding:24px; }
+  .lightbox.open{ display:flex; }
+  .lightbox img{ max-width:90vw; max-height:85vh; object-fit:contain; }
+  .lightbox-close{ position:absolute; top:20px; right:24px; color:#fff; background:none; border:none; font-size:1.6rem; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html">Accueil</a></nav>
+    <div class="header-actions"><a href="candidat.html" class="btn btn-accent btn-sm">Candidater</a></div>
+  </div>
+</header>
+
+<div class="wrap" style="padding:48px 24px;">
+  <span class="eyebrow">Vie du campus</span>
+  <h2 style="margin:8px 0 24px;">Galerie</h2>
+  <div class="filters" id="albumFilters">
+    <button class="filter-btn active" data-album="">Tous</button>
+    <button class="filter-btn" data-album="CAMPUS">Campus</button>
+    <button class="filter-btn" data-album="LABORATOIRES">Laboratoires</button>
+    <button class="filter-btn" data-album="ETUDIANTS">Étudiants</button>
+    <button class="filter-btn" data-album="EVENEMENTS">Événements</button>
+    <button class="filter-btn" data-album="PROJETS">Projets</button>
+  </div>
+  <div class="gal-grid" id="galGrid" style="margin-top:28px;">
+    <div class="skeleton" style="aspect-ratio:4/3;"></div>
+    <div class="skeleton" style="aspect-ratio:4/3;"></div>
+    <div class="skeleton" style="aspect-ratio:4/3;"></div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+  function escapeHtml(str){ const d=document.createElement("div"); d.textContent = str ?? ""; return d.innerHTML; }
+
+  async function loadGallery(album) {
+    const grid = document.getElementById("galGrid");
+    grid.innerHTML = `<div class="skeleton" style="aspect-ratio:4/3;"></div><div class="skeleton" style="aspect-ratio:4/3;"></div><div class="skeleton" style="aspect-ratio:4/3;"></div>`;
+    try {
+      const items = await VogtAPI.getGallery(album || undefined);
+      const images = (items || []).filter(i => i.mediaType === "IMAGE" && i.mediaUrl && i.album !== "HERO");
+      if (images.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Aucune photo publiée dans cet album pour le moment.</div>`;
+        return;
+      }
+      grid.innerHTML = images.map(img => `
+        <div class="gal-item" data-url="${img.mediaUrl}">
+          <img src="${img.mediaUrl}" alt="${escapeHtml(img.title || img.album || "")}" loading="lazy">
+        </div>`).join("");
+
+      grid.querySelectorAll(".gal-item").forEach(el => {
+        el.addEventListener("click", () => openLightbox(el.dataset.url));
+      });
+    } catch (err) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Impossible de charger la galerie.</div>`;
+    }
+  }
+
+  function openLightbox(url) {
+    document.getElementById("lightboxImg").src = url;
+    document.getElementById("lightbox").classList.add("open");
+  }
+  document.getElementById("lightboxClose").addEventListener("click", () => document.getElementById("lightbox").classList.remove("open"));
+  document.getElementById("lightbox").addEventListener("click", (e) => { if (e.target.id === "lightbox") e.currentTarget.classList.remove("open"); });
+
+  document.querySelectorAll("#albumFilters .filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#albumFilters .filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadGallery(btn.dataset.album);
+    });
+  });
+
+  loadGallery("");
+</script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>

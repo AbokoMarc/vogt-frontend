@@ -4,17 +4,14 @@
 <script src="js/theme-toggle.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connexion Étudiant / Enseignant — VOGT HIGH TECH</title>
+<title>Connexion Étudiant — VOGT HIGH TECH</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/theme.css">
 <style>
   .auth-wrap{ max-width:420px; margin: 64px auto; }
-  .tabs{ display:flex; gap:4px; background: var(--color-surface); border:1px solid var(--color-border); border-radius: var(--radius); padding:4px; margin-bottom:24px; }
-  .tab-btn{ flex:1; text-align:center; padding:.6rem 0; border-radius: 8px; font-size:.88rem; font-weight:600; color: var(--color-text-muted); cursor:pointer; }
-  .tab-btn.active{ background:var(--color-bg); color: var(--color-accent); box-shadow: var(--shadow-sm); }
 </style>
 </head>
 <body>
@@ -32,11 +29,7 @@
 
 <div class="wrap auth-wrap">
   <div class="panel">
-    <div class="tabs">
-      <div class="tab-btn active" data-role="STUDENT">Étudiant</div>
-      <div class="tab-btn" data-role="TEACHER">Enseignant</div>
-    </div>
-
+    <h3 style="margin-bottom:8px;">Connexion étudiant</h3>
     <p class="field-hint" style="margin-bottom:18px;">Votre compte a été créé par l'administration Vogt. Si vous n'avez pas encore vos identifiants, contactez le secrétariat.</p>
 
     <div id="formMessage"></div>
@@ -50,6 +43,9 @@
     <p class="field-hint" style="margin-top:16px; text-align:center;">
       <a href="forgot-password.html" style="color:var(--color-accent);" data-i18n="forgot_password">Mot de passe oublié ?</a>
     </p>
+    <p class="field-hint" style="margin-top:8px; text-align:center;">
+      Vous êtes enseignant ? <a href="enseignant-login.html" style="color:var(--color-accent);">Connexion enseignant</a>
+    </p>
   </div>
 </div>
 
@@ -61,28 +57,8 @@
 </footer>
 
 <script src="js/i18n.js"></script>
-<script>window.VOGT_API_BASE_URL = "https://vogt-backend.onrender.com/api/v1";</script>
 <script src="js/api.js"></script>
 <script>
-  let selectedTab = "STUDENT";
-
-  const preselect = new URLSearchParams(window.location.search).get("role");
-  if (preselect === "TEACHER") {
-    selectedTab = "TEACHER";
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
-      document.querySelector('.tab-btn[data-role="TEACHER"]').classList.add("active");
-    });
-  }
-
-  document.querySelectorAll(".tab-btn").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      selectedTab = tab.dataset.role;
-    });
-  });
-
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const box = document.getElementById("formMessage");
@@ -91,24 +67,19 @@
     const password = document.getElementById("loginPassword").value;
     try {
       const data = await VogtAPI.login(email, password);
-      if (data.role !== "STUDENT" && data.role !== "TEACHER") {
+      if (data.role !== "STUDENT") {
         VogtAPI.logout();
-        box.innerHTML = `<div class="alert alert-error">Ce compte n'est ni étudiant ni enseignant. Utilisez la page de connexion appropriée.</div>`;
+        box.innerHTML = `<div class="alert alert-error">Ce compte n'est pas un compte étudiant. ${data.role === "TEACHER" ? 'Utilisez la <a href="enseignant-login.html" style="color:inherit;text-decoration:underline;">connexion enseignant</a>.' : ""}</div>`;
         return;
       }
-      if (data.role !== selectedTab) {
-        box.innerHTML = `<div class="alert alert-success">Connecté en tant que ${data.role === "TEACHER" ? "enseignant" : "étudiant"} — redirection...</div>`;
-      }
-      window.location.href = data.role === "TEACHER" ? "enseignant.html" : "etudiant.html";
+      window.location.href = "etudiant.html";
     } catch (err) {
       box.innerHTML = `<div class="alert alert-error">${err.message || "Identifiants invalides."}</div>`;
     }
   });
 
-  if (VogtAPI.isAuthenticated()) {
-    const role = VogtAPI.getRole();
-    if (role === "STUDENT") window.location.href = "etudiant.html";
-    else if (role === "TEACHER") window.location.href = "enseignant.html";
+  if (VogtAPI.isAuthenticated() && VogtAPI.getRole() === "STUDENT") {
+    window.location.href = "etudiant.html";
   }
 </script>
 <script src="js/mobile-nav.js"></script>

@@ -23,7 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await VogtAPI.login(email, password);
       if (data.role === "STUDENT" || data.role === "TEACHER") {
         VogtAPI.logout();
-        showMessage(`Ce compte est un compte ${data.role === "TEACHER" ? "enseignant" : "étudiant"}. Utilisez la <a href="staff-login.html" style="color:inherit; text-decoration:underline;">connexion Étudiant / Enseignant</a>.`, "error");
+        const loginPage = data.role === "TEACHER" ? "enseignant-login.html" : "staff-login.html";
+        const label = data.role === "TEACHER" ? "enseignant" : "étudiant";
+        showMessage(`Ce compte est un compte ${label}. Utilisez la <a href="${loginPage}" style="color:inherit; text-decoration:underline;">connexion ${label}</a>.`, "error");
         return;
       }
       redirectByRole();

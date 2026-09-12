@@ -156,6 +156,9 @@ const VogtAPI = (() => {
       listAcademicYears: () => request("/admin/academic-years", { auth: true }),
       createAcademicYear: (body) => request("/admin/academic-years", { method: "POST", body, auth: true }),
       activateAcademicYear: (id) => request(`/admin/academic-years/${id}/activate`, { method: "POST", auth: true }),
+      deleteAcademicYear: (id) => request(`/admin/academic-years/${id}`, { method: "DELETE", auth: true }),
+      restoreAcademicYear: (id) => request(`/admin/academic-years/${id}/restore`, { method: "POST", auth: true }),
+      listAcademicYearsTrash: () => request("/admin/academic-years/trash", { auth: true }),
 
       listLabs: () => request("/admin/labs", { auth: true }),
       createLab: (body) => request("/admin/labs", { method: "POST", body, auth: true }),

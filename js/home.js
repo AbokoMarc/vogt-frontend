@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadHeroCarousel();
   loadLabs();
   loadPartnersSection();
+  loadProjects();
 });
 
 async function loadHeroCarousel() {
@@ -29,6 +30,7 @@ async function loadHeroCarousel() {
     container.innerHTML = images.map((img, i) =>
       `<div class="slide ${i === 0 ? "active" : ""}" style="background-image:url('${img.mediaUrl}')"></div>`
     ).join("");
+    container.classList.add("has-images");
 
     if (images.length > 1) {
       const dotsWrap = document.createElement("div");
@@ -52,6 +54,26 @@ async function loadHeroCarousel() {
   }
 }
 
+async function loadProjects() {
+  const grid = document.getElementById("projectsGrid");
+  try {
+    const projects = await VogtAPI.getStudentProjects();
+    if (!projects || projects.length === 0) {
+      grid.innerHTML = `<div class="empty-state">Aucun projet publié pour le moment.</div>`;
+      return;
+    }
+    grid.innerHTML = projects.map(p => `
+      <div class="proj-card">
+        <span class="proj-meta">${escapeHtml(p.category || "")}${p.year ? " — " + escapeHtml(p.year) : ""}</span>
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.description || "")}</p>
+        <div class="proj-tags">${(p.technologies || []).slice(0, 4).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>
+      </div>`).join("");
+  } catch (err) {
+    grid.innerHTML = `<div class="empty-state">Impossible de charger les projets.</div>`;
+  }
+}
+
 async function loadLabs() {
   const grid = document.getElementById("labsGrid");
   try {
@@ -62,7 +84,7 @@ async function loadLabs() {
     }
     grid.innerHTML = labs.map(l => `
       <div class="lab-card">
-        <div class="lab-dot"></div>
+        ${l.imageUrl ? `<img src="${l.imageUrl}" alt="${escapeHtml(l.name)}" style="width:100%; height:120px; object-fit:cover; margin-bottom:16px;">` : `<div class="lab-dot"></div>`}
         <h3>${escapeHtml(l.name)}</h3>
         <p>${escapeHtml(l.description || "")}</p>
       </div>`).join("");
@@ -80,8 +102,8 @@ async function loadPartnersSection() {
       return;
     }
     strip.innerHTML = partners.map(p => p.logoUrl
-      ? `<img class="partner-logo" src="${p.logoUrl}" alt="${escapeHtml(p.name)}" title="${escapeHtml(p.name)}">`
-      : `<span class="partner-fallback">${escapeHtml(p.name)}</span>`
+      ? `<div class="partner-logo"><img src="${p.logoUrl}" alt="${escapeHtml(p.name)}" title="${escapeHtml(p.name)}"></div>`
+      : `<div class="partner-fallback">${escapeHtml(p.name)}</div>`
     ).join("");
   } catch (err) {
     strip.innerHTML = `<div class="empty-state">Impossible de charger les partenaires.</div>`;
@@ -90,7 +112,7 @@ async function loadPartnersSection() {
 
 function categories() {
   const t = (k, fallback) => (window.VogtI18n && VogtI18n.getLang() === "en")
-    ? { "": "All", INFORMATIQUE: "Computer Science", IA_DATA: "AI & Data", ELECTRONIQUE: "Electronics", ROBOTIQUE: "Robotics" }[k]
+    ? { "": "All", INFORMATIQUE: "Computer Science", IA_DATA: "AI & Data", ELECTRONIQUE: "Electronics", ROBOTIQUE: "Robotics", GENIE_CIVIL: "Civil Engineering" }[k]
     : fallback;
   return [
     { key: "", label: t("", "Tous") },
@@ -98,6 +120,7 @@ function categories() {
     { key: "IA_DATA", label: t("IA_DATA", "IA & Data") },
     { key: "ELECTRONIQUE", label: t("ELECTRONIQUE", "Électronique") },
     { key: "ROBOTIQUE", label: t("ROBOTIQUE", "Robotique") },
+    { key: "GENIE_CIVIL", label: t("GENIE_CIVIL", "Génie Civil") },
   ];
 }
 

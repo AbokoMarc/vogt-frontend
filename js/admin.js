@@ -162,6 +162,7 @@ function openProgramModal(id) {
           <option value="IA_DATA" ${program?.category === "IA_DATA" ? "selected" : ""}>IA & Data</option>
           <option value="ELECTRONIQUE" ${program?.category === "ELECTRONIQUE" ? "selected" : ""}>Électronique</option>
           <option value="ROBOTIQUE" ${program?.category === "ROBOTIQUE" ? "selected" : ""}>Robotique</option>
+          <option value="GENIE_CIVIL" ${program?.category === "GENIE_CIVIL" ? "selected" : ""}>Génie Civil</option>
         </select>
       </div>
       <div class="field"><label>Durée</label><input name="durationLabel" value="${program ? escapeAttr(program.durationLabel) : "5 ans"}"></div>
@@ -341,17 +342,26 @@ function openEventModal(id) {
     </div>
     <div class="field"><label>Lieu</label><input name="location" value="${evt ? escapeAttr(evt.location) : ""}"></div>
     <div class="field"><label>Description</label><textarea name="description" rows="3">${evt ? escapeHtml(evt.description || "") : ""}</textarea></div>
+    <div class="field"><label>Photo (optionnelle)</label><input type="file" name="coverImage" accept="image/*"></div>
+    ${evt && evt.coverImageUrl ? `<img src="${evt.coverImageUrl}" style="height:60px; border-radius:6px; margin:-8px 0 14px;">` : ""}
     <p class="field-hint" style="margin:14px 0 6px;">Traduction anglaise (optionnelle)</p>
     <div class="field"><label>Title (EN)</label><input name="titleEn" value="${evt ? escapeAttr(evt.titleEn) : ""}"></div>
     <div class="field"><label>Description (EN)</label><textarea name="descriptionEn" rows="2">${evt ? escapeHtml(evt.descriptionEn || "") : ""}</textarea></div>
     <button type="submit" class="btn btn-accent btn-block">${evt ? "Enregistrer" : "Créer"}</button>
   `, async (formData) => {
+    let coverImageUrl = evt ? evt.coverImageUrl : null;
+    const file = formData.get("coverImage");
+    if (file && file.size > 0) {
+      const uploaded = await VogtAPI.admin.uploadMedia(file, "events");
+      coverImageUrl = uploaded.url;
+    }
     const body = {
       title: formData.get("title"),
       startsAt: formData.get("startsAt") ? new Date(formData.get("startsAt")).toISOString() : null,
       endsAt: formData.get("endsAt") ? new Date(formData.get("endsAt")).toISOString() : null,
       location: formData.get("location"),
       description: formData.get("description"),
+      coverImageUrl: coverImageUrl,
       titleEn: formData.get("titleEn"),
       descriptionEn: formData.get("descriptionEn"),
       registrationRequired: false,
@@ -371,22 +381,68 @@ async function loadYears() {
     const years = await VogtAPI.admin.listAcademicYears();
     if (years.length === 0) {
       el.innerHTML = `<div class="empty-state">Aucune année académique. Créez la première.</div>`;
-      return;
+    } else {
+      el.innerHTML = `
+        <table>
+          <tr><th>Année</th><th>Statut</th><th>Actions</th></tr>
+          ${years.map(y => `
+            <tr>
+              <td>${escapeHtml(y.label)}</td>
+              <td><span class="status-badge status-${y.status === "ACTIVE" ? "ADMITTED" : "DRAFT"}">${y.status}</span></td>
+              <td class="row-actions">
+                ${y.status !== "ACTIVE" ? `<button onclick="activateYear('${y.id}')">Activer</button>` : ""}
+                ${y.status !== "ACTIVE" ? `<button onclick="deleteYear('${y.id}')">Supprimer</button>` : ""}
+              </td>
+            </tr>`).join("")}
+        </table>`;
     }
-    el.innerHTML = `
-      <table>
-        <tr><th>Année</th><th>Statut</th><th>Actions</th></tr>
-        ${years.map(y => `
-          <tr>
-            <td>${escapeHtml(y.label)}</td>
-            <td><span class="status-badge status-${y.status === "ACTIVE" ? "ADMITTED" : "DRAFT"}">${y.status}</span></td>
-            <td class="row-actions">
-              ${y.status !== "ACTIVE" ? `<button onclick="activateYear('${y.id}')">Activer</button>` : ""}
-            </td>
-          </tr>`).join("")}
-      </table>`;
   } catch (err) {
     el.innerHTML = `<div class="empty-state">Impossible de charger les années académiques. ${err.message ? "(" + err.message + ")" : ""}</div>`;
+  }
+  await loadYearsTrash();
+}
+
+async function loadYearsTrash() {
+  let trashEl = document.getElementById("yearsTrash");
+  if (!trashEl) {
+    trashEl = document.createElement("div");
+    trashEl.id = "yearsTrash";
+    trashEl.style.marginTop = "24px";
+    document.getElementById("yearsTable").after(trashEl);
+  }
+  try {
+    const trashed = await VogtAPI.admin.listAcademicYearsTrash();
+    if (!trashed || trashed.length === 0) { trashEl.innerHTML = ""; return; }
+    trashEl.innerHTML = `
+      <h4 style="margin-bottom:10px; font-size:.9rem;">🗑 Corbeille (restaurable 30 jours)</h4>
+      <table>
+        <tr><th>Année</th><th>Actions</th></tr>
+        ${trashed.map(y => `
+          <tr><td>${escapeHtml(y.label)}</td><td class="row-actions"><button onclick="restoreYear('${y.id}')">Restaurer</button></td></tr>`).join("")}
+      </table>`;
+  } catch (err) {
+    trashEl.innerHTML = "";
+  }
+}
+
+async function deleteYear(id) {
+  if (!confirm("Supprimer cette année académique ? Elle restera restaurable pendant 30 jours.")) return;
+  try {
+    await VogtAPI.admin.deleteAcademicYear(id);
+    showMessage("Année supprimée — restaurable 30 jours.", "success");
+    await loadYears();
+  } catch (err) {
+    showMessage(err.message || "Suppression impossible.", "error");
+  }
+}
+
+async function restoreYear(id) {
+  try {
+    await VogtAPI.admin.restoreAcademicYear(id);
+    showMessage("Année restaurée.", "success");
+    await loadYears();
+  } catch (err) {
+    showMessage(err.message || "Restauration impossible.", "error");
   }
 }
 
@@ -458,11 +514,19 @@ function openLabModal() {
   openModal("Nouveau laboratoire", `
     <div class="field"><label>Nom</label><input name="name" required placeholder="AI Lab"></div>
     <div class="field"><label>Description</label><textarea name="description" rows="3"></textarea></div>
+    <div class="field"><label>Photo (optionnelle)</label><input type="file" name="image" accept="image/*"></div>
     <button type="submit" class="btn btn-accent btn-block">Créer</button>
   `, async (formData) => {
+    let imageUrl = null;
+    const file = formData.get("image");
+    if (file && file.size > 0) {
+      const uploaded = await VogtAPI.admin.uploadMedia(file, "labs");
+      imageUrl = uploaded.url;
+    }
     await VogtAPI.admin.createLab({
       name: formData.get("name"),
       description: formData.get("description"),
+      imageUrl: imageUrl,
       futureProject: true,
     });
     showMessage("Laboratoire créé.", "success");
