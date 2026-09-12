@@ -5,7 +5,7 @@
  */
 const VogtAPI = (() => {
 
-  // Forçage de l'URL absolue de votre API de production sur Render
+  // SÉCURITÉ : URL de production absolue écrite directement en dur pour interdire le bug de redirection
   const BASE_URL = "https://onrender.com";
 
   const TOKEN_KEY = "vogt_access_token";
@@ -40,7 +40,7 @@ const VogtAPI = (() => {
       if (token) headers["Authorization"] = "Bearer " + token;
     }
 
-    // Utilisation stricte de la constante BASE_URL de production
+    // Utilisation stricte de la constante locale de production
     const res = await fetch(BASE_URL + path, {
       method,
       headers,
