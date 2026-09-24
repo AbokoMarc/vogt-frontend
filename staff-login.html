@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="js/config.js"></script>
+<script src="js/theme-toggle.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion Étudiant — VOGT HIGH TECH</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  .auth-wrap{ max-width:420px; margin: 64px auto; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">V</span>
+      <span class="brand-text"><b>VOGT HIGH TECH</b><span>ÉCOLE SUPÉRIEURE — INUCASTY</span></span>
+    </a>
+    <nav class="primary-nav"><a href="index.html" data-i18n="nav_accueil">Accueil</a></nav>
+    <div class="header-actions"><span class="lang-switch" style="display:flex; gap:6px; margin-right:6px;"><button data-lang="fr" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">FR</button><span style="color:rgba(255,255,255,.3);">|</span><button data-lang="en" style="background:none;border:none;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:.75rem;cursor:pointer;">EN</button></span></div>
+  </div>
+</header>
+
+<div class="wrap auth-wrap">
+  <div class="panel">
+    <h3 style="margin-bottom:8px;">Connexion étudiant</h3>
+    <p class="field-hint" style="margin-bottom:18px;">Votre compte a été créé par l'administration Vogt. Si vous n'avez pas encore vos identifiants, contactez le secrétariat.</p>
+
+    <div id="formMessage"></div>
+
+    <form id="loginForm">
+      <div class="field"><label data-i18n="login_email">Email</label><input type="email" id="loginEmail" required></div>
+      <div class="field"><label data-i18n="login_password">Mot de passe</label><input type="password" id="loginPassword" required></div>
+      <button type="submit" class="btn btn-accent btn-block" data-i18n="login_submit">Se connecter</button>
+    </form>
+
+    <p class="field-hint" style="margin-top:16px; text-align:center;">
+      <a href="forgot-password.html" style="color:var(--color-accent);" data-i18n="forgot_password">Mot de passe oublié ?</a>
+    </p>
+    <p class="field-hint" style="margin-top:8px; text-align:center;">
+      Vous êtes enseignant ? <a href="enseignant-login.html" style="color:var(--color-accent);">Connexion enseignant</a>
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="badge-inucasty">Une école de l'INUCASTY</span>
+    <span class="copyright">© 2026 VOGT HIGH TECH</span>
+  </div>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/api.js"></script>
+<script>
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const box = document.getElementById("formMessage");
+    box.innerHTML = "";
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    try {
+      const data = await VogtAPI.login(email, password);
+      if (data.role !== "STUDENT") {
+        VogtAPI.logout();
+        box.innerHTML = `<div class="alert alert-error">Ce compte n'est pas un compte étudiant. ${data.role === "TEACHER" ? 'Utilisez la <a href="enseignant-login.html" style="color:inherit;text-decoration:underline;">connexion enseignant</a>.' : ""}</div>`;
+        return;
+      }
+      window.location.href = "etudiant.html";
+    } catch (err) {
+      box.innerHTML = `<div class="alert alert-error">${err.message || "Identifiants invalides."}</div>`;
+    }
+  });
+
+  if (VogtAPI.isAuthenticated() && VogtAPI.getRole() === "STUDENT") {
+    window.location.href = "etudiant.html";
+  }
+</script>
+<script src="js/mobile-nav.js"></script>
+</body>
+</html>
